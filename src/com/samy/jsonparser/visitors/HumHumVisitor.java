@@ -16,7 +16,7 @@ public class HumHumVisitor implements Visitor {
 
     }
     private void spit(JSONParser parser) {
-        System.out.println(PREFIX + parser.getClass().getName() + "            " + parser.getJsonObjectLexer().getToken().getValue() + "" );
+        System.out.println(PREFIX +   parser.getClass().getName().substring(parser.getClass().getName().lastIndexOf(".")) + "            " + parser.getJsonObjectLexer().getToken().getValue() + "" );
     }
     @Override
     public void visit(ElementParser parser) {
