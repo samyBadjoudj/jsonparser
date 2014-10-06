@@ -3,6 +3,136 @@ jsonparser
 
 Basic JSON parser little exercise, lexer, token, visitor design pattern, first and follow sets, grammar,
 
+Writing a parser:
+
+----------------------------------------------------
+
+
+When we see how a compiler/interpreter is written, we can notice different parts.
+
+Front-end is composed by:
+
+Lexer  : breaks your code in tokens (primitive part of your language) using syntax diagram of the grammar
+Parser : Use the tokens and the grammar of your language to get the parse tree 
+Type Checker -> Does the semantic analysis 
+
+Intermediate layer:
+
+Symbol table : Data structure (Stack of Hashtable for example) that binds an identifier 
+to an information of the code (variables, scopes, functions...)
+
+Back-end:
+
+  Analysis : data-flow, dependance, alias analysis, call graph, control flow graph ...
+  Optimization: inline expansion
+  Code generation.
+
+http://en.wikipedia.org/wiki/Compiler
+
+
+----------------------------------------------------
+
+To begin we have to understand the language we want to parse, so we introduce the notion of grammar. 
+
+They are the rule of the language. So with this grammar we can write down in this new language.
+
+Usually in computer science for a new language we use Context Free Language that means 
+it has been written with a Context Free Grammar (CFG).
+
+A CFG can be written : X->z
+
+X is a non terminal symbol (produces symbol) and z could be a terminal (final value, 
+for ex:1,'a',234) or non terminal symbal. We say it's a context free grammar when X can always be replaced.
+
+
+---------------------------------------------------
+
+
+So to write a parser we can do: 
+
+Etablished a parsing table (check if there is no ambiguity in the grammar) 
+then write a predictive parser that use this parsing table.
+
+To establish this this parsing table first we need to get FIRST and FOLLOW sets of the grammar
+(https://www.cs.uaf.edu/~cs331/notes/FirstFollow.pdf).
+
+Then when we have checked that there is no ambiguity.
+(http://en.wikibooks.org/wiki/Introduction_to_Programming_Languages/Ambiguity) we can write a predictive parser.
+http://en.wikipedia.org/wiki/LL_parser
+
+Or we can write it without using a parsing table as a structure in the code, 
+we can use  the grammar and first and follow sets.
+
+
+Here are the grammar on our case the JSON one ( I have put FIRSTS FOLLOWS sets :
+<pre>
+object
+    {}
+    { members } 
+members
+    pair
+    pair , members
+pair
+    string : value
+array
+    []
+    [ elements ]
+elements
+    value
+    value , elements
+value
+    string | number | object | array | true | false | null 
+    
+
+
+
+         FIRST                                                                                           
+
+Object     '{'                                                                                           
+Members    '"'                                                                                           
+Pair       '"'                                                                                           
+Array      '['                                                                                           
+Elements   '"' , number , '{' , '[' , 't|T' , 'f|F' , 'n|N'                                              
+Values     '"' , number , '{' , '[' , 't|T' , 'f|F' , 'n|N'                                              
+
+
+         FOLLOWS                                                                                         
+
+Object    '}','"'                                                                                        
+Members   '}'                                                                                            
+Pair      '}','                                                                                          
+Array     ']' , '"' , number , '{' , '[' , 't|T' , 'f|F' , 'n|N'        
+Elements  ']'                                                                                            
+Values    ',' ']'                                                                                        
+
+</pre>
+
+
+I let you dive into the code :
+
+
+We have 3 elements :
+
+We have the Lexer wich uses the SourceCode (the SourceCode class parses char by char the code) to split our code 
+into tokens.
+
+According to the grammar and the First and Flollow set we call the correct parser.
+
+We pass a Visitor (to avoid to scatter the code), to print the what has been parsed.
+
+
+
+TODO : 
+
+- Be able to parse true, false, null, withour double quotes "
+- Create a proper tree or other data structure with the data parsed
+- Throw execpetion when is not well formatted (using FIRST and FOLLOW sets)
+
+
+
+
+
+
 
 Output : 
 <pre>
